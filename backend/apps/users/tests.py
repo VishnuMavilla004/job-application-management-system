@@ -41,7 +41,7 @@ class TestUserModel(TestCase):
             first_name="Test",
         )
 
-        assert user.email == "TEST@example.com"
+        assert user.email == "test@example.com"
 
     def test_create_superuser(self):
 
