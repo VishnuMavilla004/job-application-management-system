@@ -1,13 +1,10 @@
+
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
-from django.core.validators import FileExtensionValidator
 
-from .validators import validate_file_size
-
-
-def resume_upload_path(instance, filename):
-    return f"users/{instance.user_id}/resumes/{filename}"
+from apps.documents.upload_paths import resume_upload_path
+from apps.documents.validators import validate_resume_file
 
 
 class ResumeDocument(models.Model):
@@ -22,12 +19,7 @@ class ResumeDocument(models.Model):
 
     file = models.FileField(
         upload_to=resume_upload_path,
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=["pdf", "doc", "docx"]
-            ),
-            validate_file_size,
-        ],
+        validators=[validate_resume_file],
     )
 
     is_default = models.BooleanField(default=False)

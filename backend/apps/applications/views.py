@@ -100,7 +100,7 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
         return (
             JobApplication.objects
             .filter(user=self.request.user)
-            .select_related("user", "company")
+            .select_related("company")
             .prefetch_related("status_history")
             .order_by("-created_at")
         )
