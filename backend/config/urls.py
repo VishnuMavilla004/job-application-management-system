@@ -38,6 +38,11 @@ urlpatterns = [
         name="swagger-ui",
     ),
 
+    path(
+    "api/v1/",
+    include("apps.applications.urls"),
+    ),
+
     # User authentication and profile APIs
     path("api/v1/", include("apps.users.urls")),
 ]

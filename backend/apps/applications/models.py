@@ -3,7 +3,6 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import F, Q
 from django.utils import timezone
-from django.db.models import Q
 
 from apps.companies.models import Company
 from .choices import (
