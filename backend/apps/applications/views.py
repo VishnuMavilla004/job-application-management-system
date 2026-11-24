@@ -20,6 +20,11 @@ from apps.applications.serializers import (
 from apps.companies.models import Company
 from apps.companies.serializers import CompanySerializer
 
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from apps.applications.filters import JobApplicationFilter
+from apps.applications.pagination import ApplicationPagination
+
 
 logger = logging.getLogger(__name__)
 
@@ -36,8 +41,45 @@ class CompanyListCreateView(ListCreateAPIView):
 
 
 class JobApplicationViewSet(viewsets.ModelViewSet):
+
     serializer_class = JobApplicationSerializer
-    permission_classes = [IsAuthenticated, IsApplicationOwner]
+
+    permission_classes = [
+        IsAuthenticated,
+        IsApplicationOwner,
+    ]
+
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter,
+    ]
+
+    filterset_class = JobApplicationFilter
+
+    search_fields = [
+    "job_title",
+    "location",
+    "company__name",
+    "contact_person",
+    "contact_email",
+    ]
+
+    ordering_fields = [
+        "job_title",
+        "applied_date",
+        "deadline",
+        "salary_min",
+        "salary_max",
+        "status",
+        "created_at",
+        "updated_at",
+        "company__name",
+    ]
+
+    ordering = ["-created_at"]
+
+    pagination_class = ApplicationPagination
 
     def get_queryset(self):
         return (
@@ -100,7 +142,10 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
         detail=True,
         methods=["get"],
         url_path="history",
-        permission_classes=[IsAuthenticated, IsApplicationOwner],
+        permission_classes=[
+            IsAuthenticated,
+            IsApplicationOwner,
+        ],
     )
     def history(self, request, pk=None):
         application = self.get_object()
