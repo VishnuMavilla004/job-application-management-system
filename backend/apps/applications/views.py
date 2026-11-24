@@ -25,6 +25,17 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from apps.applications.filters import JobApplicationFilter
 from apps.applications.pagination import ApplicationPagination
 
+from apps.applications.serializers import (
+    JobApplicationSerializer,
+    ApplicationStatusHistorySerializer,
+    ApplicationStatusUpdateSerializer,
+)
+
+from apps.applications.services import (
+    record_status_change,
+    change_application_status,
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -116,12 +127,17 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
         updated_application = serializer.save()
 
         if old_status != updated_application.status:
-            ApplicationStatusHistory.objects.create(
+            remarks = self.request.data.get(
+                "remarks",
+                "Application status updated.",
+            )
+
+            record_status_change(
                 application=updated_application,
                 old_status=old_status,
                 new_status=updated_application.status,
                 changed_by=self.request.user,
-                remarks="Application status updated.",
+                remarks=remarks,
             )
 
         logger.info(
@@ -167,6 +183,53 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
                 "success": True,
                 "message": "Application history retrieved successfully.",
                 "data": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    
+    @action(
+        detail=True,
+        methods=["patch"],
+        url_path="status",
+        permission_classes=[
+            IsAuthenticated,
+            IsApplicationOwner,
+        ],
+    )
+    @transaction.atomic
+    def update_status(self, request, pk=None):
+        application = self.get_object()
+
+        serializer = ApplicationStatusUpdateSerializer(
+            data=request.data,
+            context={
+                "application": application,
+                "request": request,
+            },
+        )
+        serializer.is_valid(raise_exception=True)
+
+        history = change_application_status(
+            application=application,
+            new_status=serializer.validated_data["status"],
+            changed_by=request.user,
+            remarks=serializer.validated_data.get("remarks", ""),
+        )
+
+        application.refresh_from_db()
+
+        return Response(
+            {
+                "success": True,
+                "message": "Application status updated successfully.",
+                "data": {
+                    "application_id": application.id,
+                    "old_status": history.old_status,
+                    "new_status": history.new_status,
+                    "remarks": history.remarks,
+                    "changed_at": history.changed_at,
+                },
             },
             status=status.HTTP_200_OK,
         )
