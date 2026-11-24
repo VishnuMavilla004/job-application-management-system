@@ -36,6 +36,10 @@ from apps.applications.services import (
     change_application_status,
 )
 
+from apps.applications.notification_services import (
+    notify_application_created,
+    notify_application_status_changed,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -113,6 +117,8 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
             remarks="Application created.",
         )
 
+        notify_application_created(application)
+
         logger.info(
             "Application %s created by user %s",
             application.id,
@@ -138,6 +144,12 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
                 new_status=updated_application.status,
                 changed_by=self.request.user,
                 remarks=remarks,
+            )
+
+            notify_application_status_changed(
+                updated_application,
+                old_status,
+                updated_application.status,
             )
 
         logger.info(
@@ -215,6 +227,11 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
             new_status=serializer.validated_data["status"],
             changed_by=request.user,
             remarks=serializer.validated_data.get("remarks", ""),
+        )
+        notify_application_status_changed(
+            application,
+            history.old_status,
+            history.new_status,
         )
 
         application.refresh_from_db()

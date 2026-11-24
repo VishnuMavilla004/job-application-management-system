@@ -12,6 +12,7 @@ from .choices import (
 )
 
 
+
 class JobApplication(models.Model):
 
     user = models.ForeignKey(
@@ -288,3 +289,54 @@ class ApplicationNote(models.Model):
         return (
             f"Note for {self.application.job_title}"
         )
+
+class ApplicationNotification(models.Model):
+
+    class NotificationType(models.TextChoices):
+        APPLICATION_CREATED = (
+            "application_created",
+            "Application Created",
+        )
+        STATUS_CHANGED = (
+            "status_changed",
+            "Status Changed",
+        )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="application_notifications",
+    )
+
+    application = models.ForeignKey(
+        "applications.JobApplication",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="notifications",
+    )
+
+    notification_type = models.CharField(
+        max_length=50,
+        choices=NotificationType.choices,
+    )
+
+    title = models.CharField(max_length=200)
+
+    message = models.TextField()
+
+    is_read = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(
+                fields=["user", "is_read", "-created_at"],
+                name="appnotif_user_read_idx",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.title} - {self.user.email}"

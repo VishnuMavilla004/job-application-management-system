@@ -26,3 +26,7 @@ SIMPLE_JWT = {
     # Preserve your other existing JWT settings here.
     "SIGNING_KEY": "dev-only-jwt-signing-key-2026-11-22-secure",
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEFAULT_FROM_EMAIL = "noreply@jobmanagement.local"

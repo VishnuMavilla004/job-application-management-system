@@ -6,6 +6,8 @@ from .models import (
     JobApplication,
 )
 
+from apps.applications.models import ApplicationNotification
+
 
 @admin.register(JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
@@ -68,3 +70,31 @@ class ApplicationNoteAdmin(admin.ModelAdmin):
         "content",
         "application__job_title",
     )
+
+@admin.register(ApplicationNotification)
+class ApplicationNotificationAdmin(admin.ModelAdmin):
+
+    list_display = [
+        "id",
+        "user",
+        "notification_type",
+        "title",
+        "is_read",
+        "created_at",
+    ]
+
+    list_filter = [
+        "notification_type",
+        "is_read",
+        "created_at",
+    ]
+
+    search_fields = [
+        "user__email",
+        "title",
+        "message",
+    ]
+
+    readonly_fields = [
+        "created_at",
+    ]
