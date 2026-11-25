@@ -30,3 +30,23 @@ SIMPLE_JWT = {
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 DEFAULT_FROM_EMAIL = "noreply@jobmanagement.local"
+
+DEBUG = True
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "job_management_db",
+        "USER": "postgres",
+        "PASSWORD": "PostgreSQL@266",
+        "HOST": "localhost",
+        "PORT": "5432",
+    }
+}
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
