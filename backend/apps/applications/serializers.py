@@ -156,8 +156,12 @@ class JobApplicationSerializer(serializers.ModelSerializer):
                 )
             })
 
-        # Status transition validation on normal PATCH/PUT requests
-        if self.instance is not None and new_status is not None:
+        # Validate only when the status actually changes.
+        if (
+            self.instance is not None
+            and new_status is not None
+            and new_status != self.instance.status
+        ):
             validate_status_transition(
                 current_status=self.instance.status,
                 new_status=new_status,

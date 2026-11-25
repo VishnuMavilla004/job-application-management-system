@@ -18,6 +18,27 @@ from apps.applications.services import (
 pytestmark = pytest.mark.django_db
 
 
+
+from datetime import timedelta
+
+import pytest
+
+from django.utils import timezone
+from rest_framework import status
+
+from apps.applications.models import (
+    ApplicationStatusHistory,
+    JobApplication,
+)
+from apps.applications.services import (
+    ALLOWED_STATUS_TRANSITIONS,
+    validate_status_transition,
+)
+
+
+pytestmark = pytest.mark.django_db
+
+
 class TestStatusTransitionRules:
 
     @pytest.mark.parametrize(
@@ -373,6 +394,54 @@ class TestNormalUpdateBusinessRules:
         application.refresh_from_db()
 
         assert application.user != another_user
+
+    def test_patch_job_title_without_changing_status(
+        self,
+        authenticated_client,
+        application,
+    ):
+        original_status = application.status
+
+        response = authenticated_client.patch(
+            f"/api/v1/applications/{application.id}/",
+            {
+                "job_title": "Senior Python Developer",
+            },
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        application.refresh_from_db()
+
+        assert application.job_title == "Senior Python Developer"
+        assert application.status == original_status
+
+    def test_patch_location_and_salary_without_changing_status(
+        self,
+        authenticated_client,
+        application,
+    ):
+        original_status = application.status
+
+        response = authenticated_client.patch(
+            f"/api/v1/applications/{application.id}/",
+            {
+                "location": "Bengaluru, India",
+                "salary_min": "600000",
+                "salary_max": "900000",
+            },
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        application.refresh_from_db()
+
+        assert application.location == "Bengaluru, India"
+        assert application.salary_min == 600000
+        assert application.salary_max == 900000
+        assert application.status == original_status
 
 
 class TestAdvancedValidation:
