@@ -16,6 +16,7 @@ SECRET_KEY = os.getenv(
 )
 
 INSTALLED_APPS = [
+    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -26,7 +27,6 @@ INSTALLED_APPS = [
     
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
-    "corsheaders",
     "drf_spectacular",
 
     "apps.users",
@@ -40,7 +40,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
+    'corsheaders.middleware.CorsMiddleware'
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",

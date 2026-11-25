@@ -14,6 +14,7 @@ from apps.users.views import (
     ProfileView,
 )
 
+
 class PublicTokenRefreshView(TokenRefreshView):
     permission_classes = [AllowAny]
 
@@ -21,17 +22,13 @@ class PublicTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
+
 urlpatterns = [
-    path(
-    "auth/refresh/",
-    PublicTokenRefreshView.as_view(),
-    name="token-refresh",
-    ),
     path("auth/register/", RegisterView.as_view(), name="register"),
     path("auth/login/", LoginView.as_view(), name="login"),
     path(
         "auth/refresh/",
-        TokenRefreshView.as_view(),
+        PublicTokenRefreshView.as_view(),
         name="token-refresh",
     ),
     path("auth/logout/", LogoutView.as_view(), name="logout"),
