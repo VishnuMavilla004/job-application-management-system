@@ -153,12 +153,8 @@ export default function Dashboard() {
   const withdrawals = summary.withdrawals ?? 0;
 
   const openApplications = (filter = "") => {
-    navigate(
-      filter
-        ? `/applications?${filter}`
-        : "/applications"
-    );
-  };
+  navigate(filter ? `/applications?${filter}` : "/applications");
+};
 
   return (
     <div className="dashboard-shell">

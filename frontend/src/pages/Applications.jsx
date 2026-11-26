@@ -31,6 +31,7 @@ import "../styles/applications.css";
 const URL_FILTER_KEYS = [
   "search",
   "status",
+  "statuses",
   "company",
   "employment_type",
   "work_mode",
@@ -46,6 +47,7 @@ const URL_FILTER_KEYS = [
 const EMPTY_FILTERS = {
   search: "",
   status: "",
+  statuses: "",
   company: "",
   employment_type: "",
   work_mode: "",
@@ -341,6 +343,7 @@ const handleCreate = async (payload) => {
     const emptyFilters = {
       search: "",
       status: "",
+      statuses: "",
       company: "",
       employment_type: "",
       work_mode: "",

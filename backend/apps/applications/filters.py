@@ -1,3 +1,4 @@
+
 import django_filters
 
 from apps.applications.models import JobApplication
@@ -12,6 +13,10 @@ class JobApplicationFilter(django_filters.FilterSet):
     status = django_filters.CharFilter(
         field_name="status",
         lookup_expr="iexact",
+    )
+
+    statuses = django_filters.CharFilter(
+        method="filter_statuses",
     )
 
     employment_type = django_filters.CharFilter(
@@ -59,11 +64,37 @@ class JobApplicationFilter(django_filters.FilterSet):
         lookup_expr="lte",
     )
 
+    def filter_statuses(self, queryset, name, value):
+        requested_statuses = [
+            item.strip().lower()
+            for item in value.split(",")
+            if item.strip()
+        ]
+
+        if not requested_statuses:
+            return queryset
+
+        status_field = JobApplication._meta.get_field("status")
+
+        valid_statuses = {
+            str(choice_value).lower()
+            for choice_value, _ in status_field.choices
+        }
+
+        if not all(
+            status in valid_statuses
+            for status in requested_statuses
+        ):
+            return queryset.none()
+
+        return queryset.filter(status__in=requested_statuses)
+
     class Meta:
         model = JobApplication
         fields = [
             "company",
             "status",
+            "statuses",
             "employment_type",
             "work_mode",
             "location",
