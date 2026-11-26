@@ -19,6 +19,11 @@ from apps.applications.notification_views import (
     NotificationMarkAllReadView,
 )
 
+from apps.applications.dashboard_views import (
+    AdvancedAnalyticsView,
+    AnalyticsCSVExportView,
+)
+
 router = DefaultRouter()
 router.register(
     r"applications",
@@ -59,6 +64,17 @@ urlpatterns = [
         "notifications/read-all/",
         NotificationMarkAllReadView.as_view(),
         name="notification-mark-all-read",
+    ),
+
+    path(
+    "dashboard/analytics/",
+    AdvancedAnalyticsView.as_view(),
+    name="dashboard-advanced-analytics",
+    ),
+    path(
+        "dashboard/analytics/export/",
+        AnalyticsCSVExportView.as_view(),
+        name="dashboard-analytics-export",
     ),
 
     path("", include(router.urls)),

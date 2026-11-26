@@ -20,6 +20,10 @@ export const applicationsAPI = {
     return api.patch(`${BASE_URL}${id}/`, data);
   },
 
+  updateStatus(id, data) {
+    return api.patch(`${BASE_URL}${id}/status/`, data);
+  },
+
   delete(id) {
     return api.delete(`${BASE_URL}${id}/`);
   },

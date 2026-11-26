@@ -8,7 +8,10 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Applications from "./pages/Applications";
 import Profile from "./pages/Profile";
+import Kanban from "./pages/Kanban";
 import NotFound from "./pages/NotFound";
+
+import Analytics from "./pages/Analytics";
 
 export default function App() {
   return (
@@ -21,7 +24,9 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/applications" element={<Applications />} />
+        <Route path="/kanban" element={<Kanban />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/analytics" element={<Analytics />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

@@ -33,6 +33,8 @@ import {
 
 import "../styles/dashboard.css";
 
+import { Link } from "react-router-dom";
+
 export default function Dashboard() {
   const navigate = useNavigate();
 
@@ -169,6 +171,12 @@ export default function Dashboard() {
           unreadCount={unreadCount}
           onUnreadCountChange={setUnreadCount}
         />
+
+        <div className="dashboard-analytics-link">
+            <Link to="/analytics" className="analytics-back-link">
+                Advanced Analytics →
+            </Link>
+        </div>
 
         <div className="dashboard-content">
           <div className="dashboard-title-row">
