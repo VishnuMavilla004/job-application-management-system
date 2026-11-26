@@ -1,4 +1,8 @@
 
+/* =========================================
+   APPLICATIONS PAGE
+========================================= */
+
 .applications-content {
   padding-top: 32px;
 }
@@ -17,6 +21,10 @@
   font-size: 28px;
   font-weight: 800;
 }
+
+/* =========================================
+   BUTTONS
+========================================= */
 
 .primary-button,
 .secondary-button,
@@ -68,6 +76,10 @@
   background: #b91c1c;
 }
 
+/* =========================================
+   APPLICATION SUMMARY
+========================================= */
+
 .applications-summary {
   display: flex;
   align-items: center;
@@ -105,6 +117,10 @@
   font-family: "Manrope", sans-serif;
   font-size: 23px;
 }
+
+/* =========================================
+   APPLICATIONS PANEL AND TABLE
+========================================= */
 
 .applications-panel {
   overflow: hidden;
@@ -168,6 +184,10 @@
   font-weight: 700;
 }
 
+/* =========================================
+   APPLICATION ACTIONS
+========================================= */
+
 .application-actions {
   display: flex;
   align-items: center;
@@ -194,6 +214,10 @@
   color: #dc2626;
   background: #fff1f2;
 }
+
+/* =========================================
+   EMPTY STATE
+========================================= */
 
 .applications-empty {
   display: flex;
@@ -227,6 +251,10 @@
   font-size: 12px;
   line-height: 1.6;
 }
+
+/* =========================================
+   LOADING AND ALERTS
+========================================= */
 
 .applications-loading {
   display: flex;
@@ -266,7 +294,9 @@
   font-size: 12px;
 }
 
-/* Modal */
+/* =========================================
+   MODAL
+========================================= */
 
 .application-modal-overlay {
   position: fixed;
@@ -280,10 +310,10 @@
 }
 
 .application-modal {
-  width: 100%;
-  max-height: 90vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-height: 90vh;
   overflow: hidden;
   background: white;
   border-radius: 14px;
@@ -333,7 +363,9 @@
   padding: 22px;
 }
 
-/* Form */
+/* =========================================
+   APPLICATION FORM
+========================================= */
 
 .application-form-grid {
   display: grid;
@@ -371,6 +403,7 @@
   outline: none;
   font: inherit;
   font-size: 12px;
+  box-sizing: border-box;
 }
 
 .application-field input,
@@ -405,7 +438,9 @@
   border-top: 1px solid #edf0f5;
 }
 
-/* Details */
+/* =========================================
+   APPLICATION DETAILS
+========================================= */
 
 .details-grid {
   display: grid;
@@ -451,6 +486,10 @@
   white-space: pre-wrap;
 }
 
+/* =========================================
+   DELETE CONFIRMATION
+========================================= */
+
 .delete-confirmation {
   text-align: center;
 }
@@ -480,6 +519,207 @@
 
 .delete-confirmation .application-form-actions {
   justify-content: center;
+}
+
+/* =========================================
+   SEARCH AND FILTERS
+========================================= */
+
+.application-filters {
+  margin: 20px 0;
+  padding: 20px;
+  background: white;
+  border: 1px solid #e9ecf2;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.filter-search-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.filter-search-row input {
+  flex: 1;
+  min-width: 180px;
+}
+
+.application-filters input,
+.application-filters select {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+  color: #172033;
+  background: white;
+  border: 1px solid #dfe4ed;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.application-filters button,
+.pagination-controls button {
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid #dfe4ed;
+  border-radius: 7px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.application-filters button[type="submit"] {
+  color: white;
+  background: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.filter-reset-button {
+  color: #475569;
+  background: white;
+}
+
+.application-filters button:disabled,
+.pagination-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.filter-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================================
+   APPLICATION TOOLBAR
+   Count left, sort right, vertically centered
+========================================= */
+
+.applications-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  gap: 16px;
+  margin: 18px 0;
+  padding: 0;
+}
+
+.applications-toolbar > div {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  color: #647084;
+  font-size: 13px;
+}
+
+.applications-toolbar > div strong {
+  margin-right: 4px;
+  color: #172033;
+}
+
+.applications-toolbar label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: auto;
+  min-height: 42px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.applications-toolbar select {
+  width: 190px;
+  min-height: 40px;
+  padding: 9px 11px;
+  color: #172033;
+  background: white;
+  border: 1px solid #dfe4ed;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   PAGINATION
+========================================= */
+
+.application-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 20px 0;
+  padding: 14px 0;
+}
+
+.pagination-summary,
+.pagination-page {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 115px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pagination-controls select {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+  color: #172033;
+  background: white;
+  border: 1px solid #dfe4ed;
+  border-radius: 7px;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.pagination-controls button {
+  color: #475569;
+  background: white;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 1000px) {
+  .filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 650px) {
@@ -530,4 +770,52 @@
   .application-form-actions button {
     width: 100%;
   }
+
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-search-row {
+    flex-direction: column;
+  }
+
+  .filter-search-row button {
+    width: 100%;
+  }
+
+  .applications-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .applications-toolbar label {
+    justify-content: space-between;
+  }
+
+  .applications-toolbar select {
+    width: 190px;
+  }
+
+  .application-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pagination-controls {
+    flex-wrap: wrap;
+  }
+
+  .pagination-controls label {
+    width: 100%;
+  }
+}
+
+.applications-panel-content {
+  padding: 0 19px;
+}
+
+.applications-panel-content .applications-table-wrapper {
+  margin: 0 -19px;
+  width: calc(100% + 38px);
 }

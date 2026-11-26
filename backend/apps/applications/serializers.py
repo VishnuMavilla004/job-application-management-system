@@ -1,4 +1,6 @@
+
 from rest_framework import serializers
+from django.utils import timezone
 
 from apps.applications.models import (
     JobApplication,
@@ -6,7 +8,6 @@ from apps.applications.models import (
 )
 from apps.companies.models import Company
 from apps.companies.serializers import CompanySerializer
-
 from apps.applications.services import validate_status_transition
 
 
@@ -41,32 +42,32 @@ class JobApplicationSerializer(serializers.ModelSerializer):
     )
 
     status_history = ApplicationStatusHistorySerializer(
-    many=True,
-    read_only=True,
+        many=True,
+        read_only=True,
     )
 
     class Meta:
         model = JobApplication
         fields = [
-        "id",
-        "company",
-        "company_id",
-        "job_title",
-        "job_description",
-        "location",
-        "employment_type",
-        "work_mode",
-        "salary_min",
-        "salary_max",
-        "job_url",
-        "status",
-        "applied_date",
-        "deadline",
-        "contact_person",
-        "contact_email",
-        "status_history",
-        "created_at",
-        "updated_at",
+            "id",
+            "company",
+            "company_id",
+            "job_title",
+            "job_description",
+            "location",
+            "employment_type",
+            "work_mode",
+            "salary_min",
+            "salary_max",
+            "job_url",
+            "status",
+            "applied_date",
+            "deadline",
+            "contact_person",
+            "contact_email",
+            "status_history",
+            "created_at",
+            "updated_at",
         ]
 
         read_only_fields = [
@@ -80,13 +81,14 @@ class JobApplicationSerializer(serializers.ModelSerializer):
         value = value.strip()
 
         if not value:
-            raise serializers.ValidationError("Job title cannot be empty.")
+            raise serializers.ValidationError(
+                "Job title cannot be empty."
+            )
 
         return value
 
     def validate(self, attrs):
-        from apps.applications.services import validate_status_transition
-
+        # Use submitted values, or existing values during partial updates.
         salary_min = attrs.get(
             "salary_min",
             getattr(self.instance, "salary_min", None),
@@ -109,7 +111,10 @@ class JobApplicationSerializer(serializers.ModelSerializer):
 
         new_status = attrs.get("status")
 
+        # -------------------------------------------------
         # Salary validation
+        # -------------------------------------------------
+
         if salary_min is not None and salary_min < 0:
             raise serializers.ValidationError({
                 "salary_min": "Minimum salary cannot be negative."
@@ -131,7 +136,10 @@ class JobApplicationSerializer(serializers.ModelSerializer):
                 )
             })
 
+        # -------------------------------------------------
         # Date validation
+        # -------------------------------------------------
+
         if (
             applied_date is not None
             and deadline is not None
@@ -143,20 +151,25 @@ class JobApplicationSerializer(serializers.ModelSerializer):
                 )
             })
 
-        # Prevent future application dates
-        from django.utils import timezone
+        # Get today's date using Django's configured timezone.
+        today = timezone.localdate()
 
+        # Prevent future application dates.
         if (
             applied_date is not None
-            and applied_date > timezone.localdate()
+            and applied_date > today
         ):
             raise serializers.ValidationError({
                 "applied_date": (
-                    "Application date cannot be in the future."
+                    f"Application date cannot be in the future. "
+                    f"Today's server date is {today}."
                 )
             })
 
-        # Validate only when the status actually changes.
+        # -------------------------------------------------
+        # Application status transition validation
+        # -------------------------------------------------
+
         if (
             self.instance is not None
             and new_status is not None
@@ -168,6 +181,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             )
 
         return attrs
+
 
 class ApplicationStatusUpdateSerializer(serializers.Serializer):
 
