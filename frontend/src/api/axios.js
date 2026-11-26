@@ -23,6 +23,7 @@ const refreshClient = axios.create({
 
 let refreshPromise = null;
 
+// Attach access token to outgoing requests.
 api.interceptors.request.use((config) => {
   const accessToken = tokenStorage.getAccessToken();
 
@@ -33,6 +34,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.request.use((config) => {
+  const accessToken = tokenStorage.getAccessToken();
+
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  // Allow the browser to set multipart/form-data and its boundary.
+  if (
+    typeof FormData !== "undefined" &&
+    config.data instanceof FormData
+  ) {
+    config.headers.delete("Content-Type");
+  }
+
+  return config;
+});
+
+// Handle expired access tokens.
 api.interceptors.response.use(
   (response) => response,
 
@@ -62,13 +82,17 @@ api.interceptors.response.use(
     try {
       if (!refreshPromise) {
         refreshPromise = refreshClient
-          .post(ENDPOINTS.refresh, { refresh: refreshToken })
+          .post(ENDPOINTS.refresh, {
+            refresh: refreshToken,
+          })
           .then((response) => {
             const payload = response.data?.data ?? response.data;
             const access = payload.access;
 
             if (!access) {
-              throw new Error("Refresh response did not contain an access token.");
+              throw new Error(
+                "Refresh response did not contain an access token."
+              );
             }
 
             tokenStorage.setTokens(
@@ -92,6 +116,7 @@ api.interceptors.response.use(
     } catch (refreshError) {
       tokenStorage.clearTokens();
       window.dispatchEvent(new Event("auth:expired"));
+
       return Promise.reject(refreshError);
     }
   }

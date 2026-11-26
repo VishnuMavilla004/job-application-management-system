@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const STATUS_OPTIONS = [
   ["applied", "Applied"],

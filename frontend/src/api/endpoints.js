@@ -7,6 +7,10 @@ export const ENDPOINTS = {
   refresh: `${AUTH_BASE}refresh/`,
   logout: `${AUTH_BASE}logout/`,
 
-  // Profile endpoint is NOT inside auth/
   profile: "users/me/",
+
+  resumes: "resumes/",
+  resumeDetail: (id) => `resumes/${id}/`,
+  resumeDefault: (id) => `resumes/${id}/default/`,
+  resumeDownload: (id) => `resumes/${id}/download/`,
 };

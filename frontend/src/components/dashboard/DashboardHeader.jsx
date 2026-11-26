@@ -141,7 +141,7 @@ export default function DashboardHeader({
         )
       );
 
-      updateUnreadCount(localUnreadCount - 1);
+      updateUnreadCount(Math.max(0, localUnreadCount - 1));
     } catch (error) {
       setNotificationError(
         error.response?.data?.message ||
