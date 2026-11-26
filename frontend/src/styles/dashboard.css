@@ -742,3 +742,337 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================
+   CLICKABLE KPI CARDS
+========================================= */
+
+.stat-card-button {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.stat-card-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card-button:focus-visible {
+  outline: 3px solid rgba(99, 102, 241, 0.45);
+  outline-offset: 3px;
+}
+
+.stat-icon.gray {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* =========================================
+   NOTIFICATION DROPDOWN
+========================================= */
+
+.notification-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.notification-button {
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-button:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.notification-button:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 3px;
+}
+
+.notification-panel {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  width: 390px;
+  max-width: calc(100vw - 30px);
+  max-height: 520px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 14px 45px rgba(15, 23, 42, 0.16);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.notification-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 17px 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.notification-panel-header h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.notification-panel-header > div:first-child span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.notification-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mark-all-button,
+.close-notification-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mark-all-button {
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mark-all-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.close-notification-button {
+  color: #6b7280;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.close-notification-button:hover {
+  background: #f3f4f6;
+}
+
+.notification-list {
+  overflow-y: auto;
+  max-height: 430px;
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 17px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item.unread {
+  background: #f8faff;
+}
+
+.notification-item.read {
+  background: #ffffff;
+}
+
+.notification-item-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.notification-item-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+
+.notification-item-title strong {
+  color: #111827;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.notification-unread-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #4f46e5;
+}
+
+.notification-item-content p {
+  margin: 0 0 7px;
+  color: #4b5563;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.notification-job-title {
+  display: block;
+  margin-bottom: 7px;
+  color: #4f46e5;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.notification-item-content time {
+  display: block;
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+.notification-read-button {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #4f46e5;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.notification-read-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notification-state {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 25px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.notification-state strong {
+  color: #374151;
+  font-size: 13px;
+}
+
+.notification-state span {
+  max-width: 230px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.notification-error {
+  padding: 12px 16px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 12px;
+}
+
+.notification-error button {
+  margin-left: 8px;
+  border: none;
+  background: transparent;
+  color: #991b1b;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .notification-panel {
+    position: fixed;
+    top: 72px;
+    right: 12px;
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 90px);
+  }
+
+  .notification-list {
+    max-height: calc(100vh - 180px);
+  }
+
+  .notification-panel-header {
+    padding: 14px;
+  }
+}
+
+
+/* Clickable KPI cards */
+.stat-card-button {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 20px;
+  margin: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.stat-card-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card-button:focus-visible {
+  outline: 3px solid rgba(99, 102, 241, 0.45);
+  outline-offset: 3px;
+}
+
+.stat-icon.gray {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* Prevent dashboard horizontal overflow */
+.dashboard-shell,
+.dashboard-main,
+.dashboard-content {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.stats-grid {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: visible;
+}

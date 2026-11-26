@@ -16,14 +16,42 @@ import {
 
 import { humanize } from "../../utils/dashboardFormatters";
 
-const CHART_COLORS = [
-  "#4f46e5",
-  "#0d9488",
-  "#f59e0b",
-  "#e11d48",
-  "#64748b",
-  "#8b5cf6",
-];
+// Permanent status-to-colour mapping.
+// Colours never change based on application counts or array positions.
+const STATUS_CONFIG = {
+  applied: {
+    label: "Applied",
+    color: "#4f46e5",
+    order: 1,
+  },
+  assessment: {
+    label: "Assessment",
+    color: "#0d9488",
+    order: 2,
+  },
+  interview: {
+    label: "Interview",
+    color: "#f59e0b",
+    order: 3,
+  },
+  offer: {
+  label: "Offer",
+  color: "#F9A8D4",
+  order: 4,
+},
+  rejected: {
+  label: "Rejected",
+  color: "#dc2626",
+  order: 5,
+},
+  withdrawn: {
+    label: "Withdrawn",
+    color: "#8b5cf6",
+    order: 6,
+  },
+};
+
+const STATUS_KEYS = Object.keys(STATUS_CONFIG);
 
 export function ApplicationTrendChart({ data = [] }) {
   const chartData = data.map((item) => ({
@@ -43,7 +71,9 @@ export function ApplicationTrendChart({ data = [] }) {
       </div>
 
       {chartData.length === 0 ? (
-        <div className="chart-empty">No trend data available.</div>
+        <div className="chart-empty">
+          No trend data available.
+        </div>
       ) : (
         <div className="chart-container">
           <ResponsiveContainer width="100%" height="100%">
@@ -69,10 +99,23 @@ export function ApplicationTrendChart({ data = [] }) {
                 </linearGradient>
               </defs>
 
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+              />
+
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 12 }}
+              />
+
+              <YAxis
+                allowDecimals={false}
+                tick={{ fontSize: 12 }}
+              />
+
               <Tooltip />
+
               <Area
                 type="monotone"
                 dataKey="applications"
@@ -89,12 +132,36 @@ export function ApplicationTrendChart({ data = [] }) {
 }
 
 export function StatusDistributionChart({ data = [] }) {
-  const chartData = data.map((item) => ({
-    name: humanize(item.status),
-    value: Number(item.count ?? item.application_count ?? 0),
+  // Convert API results into a status-count lookup.
+  const statusCounts = data.reduce((counts, item) => {
+    const status = String(item.status ?? "")
+      .trim()
+      .toLowerCase();
+
+    if (!STATUS_CONFIG[status]) {
+      return counts;
+    }
+
+    counts[status] =
+      (counts[status] || 0) +
+      Number(item.count ?? item.application_count ?? 0);
+
+    return counts;
+  }, {});
+
+  // Always retain all six statuses and their fixed colours.
+  const chartData = STATUS_KEYS.map((status) => ({
+    status,
+    name: STATUS_CONFIG[status].label,
+    value: statusCounts[status] ?? 0,
+    color: STATUS_CONFIG[status].color,
   }));
 
-  const hasData = chartData.some((item) => item.value > 0);
+  const pieData = chartData.filter(
+    (item) => item.value > 0
+  );
+
+  const hasData = pieData.length > 0;
 
   return (
     <section className="chart-card">
@@ -106,14 +173,16 @@ export function StatusDistributionChart({ data = [] }) {
       </div>
 
       {!hasData ? (
-        <div className="chart-empty">No application data available.</div>
+        <div className="chart-empty">
+          No application data available.
+        </div>
       ) : (
         <>
           <div className="pie-chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={chartData.filter((item) => item.value > 0)}
+                  data={pieData}
                   dataKey="value"
                   nameKey="name"
                   cx="50%"
@@ -122,31 +191,34 @@ export function StatusDistributionChart({ data = [] }) {
                   outerRadius={90}
                   paddingAngle={3}
                 >
-                  {chartData
-                    .filter((item) => item.value > 0)
-                    .map((item, index) => (
-                      <Cell
-                        key={item.name}
-                        fill={CHART_COLORS[index % CHART_COLORS.length]}
-                      />
-                    ))}
+                  {pieData.map((item) => (
+                    <Cell
+                      key={item.status}
+                      fill={item.color}
+                    />
+                  ))}
                 </Pie>
+
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
           <div className="chart-legend">
-            {chartData.map((item, index) => (
-              <div className="legend-item" key={item.name}>
+            {chartData.map((item) => (
+              <div
+                className="legend-item"
+                key={item.status}
+              >
                 <span
                   className="legend-dot"
                   style={{
-                    backgroundColor:
-                      CHART_COLORS[index % CHART_COLORS.length],
+                    backgroundColor: item.color,
                   }}
                 />
+
                 <span>{item.name}</span>
+
                 <strong>{item.value}</strong>
               </div>
             ))}
@@ -160,7 +232,9 @@ export function StatusDistributionChart({ data = [] }) {
 export function EmploymentDistributionChart({ data = [] }) {
   const chartData = data.map((item) => ({
     type: humanize(item.employment_type ?? item.type),
-    count: Number(item.count ?? item.application_count ?? 0),
+    count: Number(
+      item.count ?? item.application_count ?? 0
+    ),
   }));
 
   return (
@@ -173,19 +247,31 @@ export function EmploymentDistributionChart({ data = [] }) {
       </div>
 
       {chartData.length === 0 ? (
-        <div className="chart-empty">No employment data available.</div>
+        <div className="chart-empty">
+          No employment data available.
+        </div>
       ) : (
         <div className="chart-container">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+              />
+
               <XAxis
                 dataKey="type"
                 tick={{ fontSize: 11 }}
                 interval={0}
               />
-              <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+
+              <YAxis
+                allowDecimals={false}
+                tick={{ fontSize: 12 }}
+              />
+
               <Tooltip />
+
               <Bar
                 dataKey="count"
                 fill="#0d9488"

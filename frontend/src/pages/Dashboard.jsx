@@ -1,5 +1,6 @@
-
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Activity,
   BriefcaseBusiness,
@@ -7,9 +8,11 @@ import {
   Gift,
   RefreshCw,
   XCircle,
+  Ban,
 } from "lucide-react";
 
 import { dashboardAPI } from "../api/dashboard.api";
+
 import Sidebar from "../components/dashboard/Sidebar";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import StatCard from "../components/dashboard/StatCard";
@@ -31,6 +34,8 @@ import {
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
   const [summary, setSummary] = useState({});
   const [trends, setTrends] = useState([]);
   const [statusDistribution, setStatusDistribution] = useState([]);
@@ -72,6 +77,7 @@ export default function Dashboard() {
 
       if (trendsResult.status === "fulfilled") {
         const data = unwrapResponse(trendsResult.value);
+
         setTrends(
           extractList(data?.trends ?? data?.monthly_trends ?? data)
         );
@@ -101,11 +107,15 @@ export default function Dashboard() {
       }
 
       if (notificationsResult.status === "fulfilled") {
-        const data = unwrapResponse(notificationsResult.value);
+        const responseBody = notificationsResult.value?.data ?? {};
+        const notificationData = unwrapResponse(
+          notificationsResult.value
+        );
 
         setUnreadCount(
           Number(
-            data?.unread_count ??
+            responseBody?.unread_count ??
+            notificationData?.unread_count ??
             summaryData?.unread_notification_count ??
             summaryData?.unread_notifications ??
             0
@@ -140,6 +150,15 @@ export default function Dashboard() {
   const interviews = summary.interviews ?? 0;
   const offers = summary.offers ?? 0;
   const rejections = summary.rejections ?? 0;
+  const withdrawals = summary.withdrawals ?? 0;
+
+  const openApplications = (filter = "") => {
+    navigate(
+      filter
+        ? `/applications?${filter}`
+        : "/applications"
+    );
+  };
 
   return (
     <div className="dashboard-shell">
@@ -152,6 +171,7 @@ export default function Dashboard() {
         <DashboardHeader
           onMenuClick={() => setSidebarOpen(true)}
           unreadCount={unreadCount}
+          onUnreadCountChange={setUnreadCount}
         />
 
         <div className="dashboard-content">
@@ -159,6 +179,7 @@ export default function Dashboard() {
             <div>
               <p className="dashboard-eyebrow">OVERVIEW</p>
               <h1>Dashboard</h1>
+
               <p className="dashboard-subtitle">
                 Track your job search progress and opportunities.
               </p>
@@ -198,6 +219,7 @@ export default function Dashboard() {
                   description="All submitted applications"
                   icon={BriefcaseBusiness}
                   color="purple"
+                  onClick={() => openApplications()}
                 />
 
                 <StatCard
@@ -206,6 +228,7 @@ export default function Dashboard() {
                   description="Applied, assessment and interview"
                   icon={Activity}
                   color="blue"
+                  onClick={() => openApplications("preset=active")}
                 />
 
                 <StatCard
@@ -214,6 +237,7 @@ export default function Dashboard() {
                   description="Interview-stage applications"
                   icon={CalendarCheck}
                   color="orange"
+                  onClick={() => openApplications("status=interview")}
                 />
 
                 <StatCard
@@ -222,6 +246,7 @@ export default function Dashboard() {
                   description="Offers received"
                   icon={Gift}
                   color="green"
+                  onClick={() => openApplications("status=offer")}
                 />
 
                 <StatCard
@@ -230,6 +255,16 @@ export default function Dashboard() {
                   description="Applications rejected"
                   icon={XCircle}
                   color="red"
+                  onClick={() => openApplications("status=rejected")}
+                />
+
+                <StatCard
+                  title="Withdrawals"
+                  value={formatNumber(withdrawals)}
+                  description="Applications withdrawn"
+                  icon={Ban}
+                  color="gray"
+                  onClick={() => openApplications("status=withdrawn")}
                 />
               </section>
 
@@ -263,6 +298,7 @@ export default function Dashboard() {
 
                 <div className="dashboard-insight-card">
                   <h3>Job search overview</h3>
+
                   <p>
                     Keep your application statuses updated to maintain
                     accurate analytics.
@@ -280,9 +316,7 @@ export default function Dashboard() {
 
                   <div className="insight-row">
                     <span>Withdrawn applications</span>
-                    <strong>
-                      {formatNumber(summary.withdrawals ?? 0)}
-                    </strong>
+                    <strong>{formatNumber(withdrawals)}</strong>
                   </div>
 
                   <div className="insight-row">
