@@ -6,6 +6,7 @@ export const ENDPOINTS = {
   login: `${AUTH_BASE}login/`,
   refresh: `${AUTH_BASE}refresh/`,
   logout: `${AUTH_BASE}logout/`,
+  changePassword: `${AUTH_BASE}change-password/`,
 
   profile: "users/me/",
 

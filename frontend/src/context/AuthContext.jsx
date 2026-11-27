@@ -16,11 +16,16 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Clears the local authentication session only.
+  const clearSession = useCallback(() => {
+    tokenStorage.clearTokens();
+    setUser(null);
+  }, []);
+
   const logout = useCallback(async () => {
     const refreshToken = tokenStorage.getRefreshToken();
 
-    tokenStorage.clearTokens();
-    setUser(null);
+    clearSession();
 
     if (refreshToken) {
       try {
@@ -29,7 +34,7 @@ export function AuthProvider({ children }) {
         console.error("Server-side logout failed:", error);
       }
     }
-  }, []);
+  }, [clearSession]);
 
   const login = async (credentials) => {
     const payload = await authAPI.login(credentials);
@@ -38,7 +43,9 @@ export function AuthProvider({ children }) {
     const refresh = payload.refresh ?? payload.tokens?.refresh;
 
     if (!access || !refresh) {
-      throw new Error("Login response did not contain both JWT tokens.");
+      throw new Error(
+        "Login response did not contain both JWT tokens."
+      );
     }
 
     tokenStorage.setTokens(access, refresh);
@@ -111,6 +118,7 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
+        clearSession,
         refreshProfile,
       }}
     >

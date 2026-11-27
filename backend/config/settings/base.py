@@ -6,13 +6,21 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-load_dotenv(BASE_DIR / ".env")
+ROOT_DIR = BASE_DIR.parent
+
+ENV_FILE = (
+    ROOT_DIR / ".env"
+    if (ROOT_DIR / ".env").exists()
+    else BASE_DIR / ".env"
+)
+
+load_dotenv(ENV_FILE)
 
 
 # Security
 SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY",
-    "development-only-insecure-key"
+    "development-only-insecure-key",
 )
 
 INSTALLED_APPS = [
@@ -71,10 +79,10 @@ WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
 # Static and media files
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key
@@ -155,37 +163,40 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 LOGGING = {
     "version": 1,
-
     "disable_existing_loggers": False,
-
     "formatters": {
         "standard": {
             "format": (
-                "%(asctime)s | "
-                "%(levelname)s | "
-                "%(name)s | "
-                "%(message)s"
+                "%(asctime)s | %(levelname)s | "
+                "%(name)s | %(message)s"
             ),
         },
     },
-
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "standard",
         },
-
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": LOG_DIR / "application.log",
-            "formatter": "standard",
-            "encoding": "utf-8",
-        },
     },
-
     "root": {
-        "handlers": ["console", "file"],
-        "level": "INFO",
+        "handlers": ["console"],
+        "level": os.getenv("LOG_LEVEL", "INFO"),
+    },
+}
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+FILE_UPLOAD_PERMISSIONS = 0o644
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": (
+            "django.contrib.staticfiles.storage."
+            "ManifestStaticFilesStorage"
+        ),
     },
 }
 
@@ -197,9 +208,18 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_PASSWORD", ""),
         "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5432"),
-        "CONN_MAX_AGE": 60,
+        "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "60")),
+        "CONN_HEALTH_CHECKS": True,
     }
 }
 
 TIME_ZONE = "Asia/Kolkata"
 USE_TZ = True
+
+# General security defaults
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+X_FRAME_OPTIONS = "DENY"
+
+# Default primary key
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

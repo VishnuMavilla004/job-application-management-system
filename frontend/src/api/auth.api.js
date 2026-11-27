@@ -8,7 +8,6 @@ export const authAPI = {
       ENDPOINTS.login,
       credentials
     );
-
     return response.data?.data ?? response.data;
   },
 
@@ -17,13 +16,11 @@ export const authAPI = {
       ENDPOINTS.register,
       userData
     );
-
     return response.data?.data ?? response.data;
   },
 
   async getProfile() {
     const response = await api.get(ENDPOINTS.profile);
-
     return response.data?.data ?? response.data;
   },
 
@@ -32,18 +29,22 @@ export const authAPI = {
       ENDPOINTS.profile,
       profileData
     );
+    return response.data?.data ?? response.data;
+  },
 
+  async changePassword(passwordData) {
+    const response = await api.post(
+      ENDPOINTS.changePassword,
+      passwordData
+    );
     return response.data?.data ?? response.data;
   },
 
   async logout(refreshToken) {
     const response = await api.post(
       ENDPOINTS.logout,
-      {
-        refresh: refreshToken,
-      }
+      { refresh: refreshToken }
     );
-
     return response.data;
   },
 };

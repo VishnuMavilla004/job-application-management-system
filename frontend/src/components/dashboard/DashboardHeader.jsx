@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bell, Menu, Search, CheckCheck, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { notificationsAPI } from "../../api/notifications.api";
+import { Link } from "react-router-dom";
 
 function getNotificationData(response) {
   const body = response?.data ?? {};
@@ -335,18 +336,23 @@ export default function DashboardHeader({
           )}
         </div>
 
-        <div className="header-user">
-          <div className="user-avatar">
+        <Link
+        to="/profile"
+        className="header-user"
+        aria-label="Open my profile workspace"
+        title="My Profile Workspace"
+        >
+        <div className="user-avatar">
             {initials || user?.email?.[0]?.toUpperCase() || "U"}
-          </div>
-
-          <div className="header-user-details">
-            <strong>
-              {user?.first_name || user?.email || "User"}
-            </strong>
-            <span>My workspace</span>
-          </div>
         </div>
+
+        <div className="header-user-details">
+            <strong>
+            {user?.first_name || user?.email || "User"}
+            </strong>
+            <span>My Profile Workspace</span>
+        </div>
+        </Link>
       </div>
     </header>
   );

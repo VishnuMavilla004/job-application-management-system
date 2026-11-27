@@ -1,5 +1,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   FileText,
   Upload,
@@ -9,6 +11,9 @@ import {
   UserRound,
   Save,
   RefreshCw,
+  LockKeyhole,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
@@ -24,33 +29,54 @@ import "../styles/profile.css";
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = [".pdf", ".doc", ".docx"];
 
+const INITIAL_PASSWORD_DATA = {
+  old_password: "",
+  new_password: "",
+  confirm_password: "",
+};
+
 function unwrap(response) {
   return response?.data?.data ?? response?.data ?? {};
+}
+
+function formatErrorValue(value) {
+  if (Array.isArray(value)) {
+    return value.map(formatErrorValue).join(" ");
+  }
+
+  if (value && typeof value === "object") {
+    return Object.entries(value)
+      .map(([key, item]) => `${key}: ${formatErrorValue(item)}`)
+      .join(" ");
+  }
+
+  return String(value);
 }
 
 function getError(error, fallback) {
   const body = error?.response?.data;
 
-  if (typeof body?.message === "string") return body.message;
-  if (typeof body?.detail === "string") return body.detail;
+  if (typeof body?.message === "string") {
+    return body.message;
+  }
 
-  if (body?.errors && typeof body.errors === "object") {
-    return Object.values(body.errors).flat().join(" ");
+  if (typeof body?.detail === "string") {
+    return body.detail;
+  }
+
+  if (body?.errors) {
+    return formatErrorValue(body.errors);
   }
 
   if (body && typeof body === "object") {
-    return Object.entries(body)
-      .map(([key, value]) => {
-        const message = Array.isArray(value)
-          ? value.join(" ")
-          : String(value);
-
-        return `${key}: ${message}`;
-      })
+    const message = Object.entries(body)
+      .map(([key, value]) => `${key}: ${formatErrorValue(value)}`)
       .join(" ");
+
+    if (message) return message;
   }
 
-  return fallback;
+  return error?.message || fallback;
 }
 
 function getResumeList(response) {
@@ -63,7 +89,8 @@ function getResumeList(response) {
 }
 
 export default function Profile() {
-  const { refreshProfile } = useAuth();
+  const { refreshProfile, clearSession } = useAuth();
+  const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
 
@@ -78,32 +105,51 @@ export default function Profile() {
   const [resumes, setResumes] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const [passwordData, setPasswordData] = useState(
+    INITIAL_PASSWORD_DATA
+  );
+
+  const [showPasswords, setShowPasswords] = useState({
+    old: false,
+    new: false,
+    confirm: false,
+  });
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
   const [actionId, setActionId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Load profile, resumes, and notification count.
   const loadPage = useCallback(async () => {
     setLoading(true);
     setError("");
 
     try {
-      const [profileResult, resumeResult, notificationResult] =
-        await Promise.allSettled([
-          authAPI.getProfile(),
-          resumesAPI.getAll(),
-          notificationsAPI.getAll({ page: 1, page_size: 1 }),
-        ]);
+      const [
+        profileResult,
+        resumeResult,
+        notificationResult,
+      ] = await Promise.allSettled([
+        authAPI.getProfile(),
+        resumesAPI.getAll(),
+        notificationsAPI.getAll({
+          page: 1,
+          page_size: 1,
+        }),
+      ]);
 
       if (profileResult.status === "rejected") {
         throw profileResult.reason;
       }
 
-      const profileData = profileResult.value;
+      const profileData = profileResult.value?.user ??
+        profileResult.value;
 
       setProfile({
         first_name: profileData.first_name ?? "",
@@ -125,19 +171,22 @@ export default function Profile() {
       }
 
       if (notificationResult.status === "fulfilled") {
-        const body = notificationResult.value?.data ?? {};
-        const payload = unwrap(notificationResult.value);
+        const notificationData = unwrap(
+          notificationResult.value
+        );
 
         setUnreadCount(
           Number(
-            body.unread_count ??
-            payload.unread_count ??
+            notificationData.unread_count ??
+            notificationResult.value?.unread_count ??
             0
           )
         );
       }
     } catch (err) {
-      setError(getError(err, "Unable to load your profile."));
+      setError(
+        getError(err, "Unable to load your profile.")
+      );
     } finally {
       setLoading(false);
     }
@@ -147,6 +196,7 @@ export default function Profile() {
     loadPage();
   }, [loadPage]);
 
+  // Profile form.
   const handleProfileChange = (event) => {
     const { name, value } = event.target;
 
@@ -174,12 +224,90 @@ export default function Profile() {
 
       setSuccess("Profile updated successfully.");
     } catch (err) {
-      setError(getError(err, "Unable to update your profile."));
+      setError(
+        getError(err, "Unable to update your profile.")
+      );
     } finally {
       setSaving(false);
     }
   };
 
+  // Password management.
+  const handlePasswordChange = (event) => {
+    const { name, value } = event.target;
+
+    setPasswordData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords((previous) => ({
+      ...previous,
+      [field]: !previous[field],
+    }));
+  };
+
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
+
+    setError("");
+    setSuccess("");
+
+    const {
+      old_password,
+      new_password,
+      confirm_password,
+    } = passwordData;
+
+    if (!old_password || !new_password || !confirm_password) {
+      setError("Please complete all password fields.");
+      return;
+    }
+
+    if (new_password !== confirm_password) {
+      setError(
+        "New password and confirmation do not match."
+      );
+      return;
+    }
+
+    if (old_password === new_password) {
+      setError(
+        "New password must differ from your current password."
+      );
+      return;
+    }
+
+    setChangingPassword(true);
+
+    try {
+      await authAPI.changePassword(passwordData);
+
+      setPasswordData(INITIAL_PASSWORD_DATA);
+
+      // The backend has already revoked outstanding refresh tokens.
+      // Clear the local session without making another logout request.
+      clearSession();
+
+      navigate("/login", {
+        replace: true,
+        state: {
+          message:
+            "Password changed successfully. Please log in again.",
+        },
+      });
+    } catch (err) {
+      setError(
+        getError(err, "Unable to change your password.")
+      );
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
+  // Resume upload.
   const handleUpload = async (event) => {
     const file = event.target.files?.[0];
 
@@ -193,22 +321,28 @@ export default function Profile() {
       .toLowerCase();
 
     if (!ALLOWED_EXTENSIONS.includes(extension)) {
-      setError("Only PDF, DOC and DOCX files are supported.");
+      setError(
+        "Only PDF, DOC and DOCX files are supported."
+      );
       event.target.value = "";
       return;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setError("Resume file size cannot exceed 5 MB.");
+      setError(
+        "Resume file size cannot exceed 5 MB."
+      );
       event.target.value = "";
       return;
     }
 
     const formData = new FormData();
+
     formData.append(
       "title",
       file.name.replace(/\.[^/.]+$/, "")
     );
+
     formData.append("file", file);
 
     setUploading(true);
@@ -216,12 +350,14 @@ export default function Profile() {
     try {
       await resumesAPI.upload(formData);
 
-      setSuccess("Resume uploaded successfully.");
-
       const response = await resumesAPI.getAll();
+
       setResumes(getResumeList(response));
+      setSuccess("Resume uploaded successfully.");
     } catch (err) {
-      setError(getError(err, "Unable to upload your resume."));
+      setError(
+        getError(err, "Unable to upload your resume.")
+      );
     } finally {
       setUploading(false);
 
@@ -231,31 +367,29 @@ export default function Profile() {
     }
   };
 
+  // Set default resume.
   const handleSetDefault = async (id) => {
-  setActionId(id);
-  setError("");
-  setSuccess("");
+    setActionId(id);
+    setError("");
+    setSuccess("");
 
-  try {
-    await resumesAPI.setDefault(id);
+    try {
+      await resumesAPI.setDefault(id);
 
-    const response = await resumesAPI.getAll();
-    setResumes(getResumeList(response));
+      const response = await resumesAPI.getAll();
 
-    setSuccess("Default resume updated.");
-  } catch (err) {
-    console.error("SET DEFAULT RESUME ERROR:", err);
-    console.error("HTTP STATUS:", err?.response?.status);
-    console.error("RESPONSE DATA:", err?.response?.data);
-    console.error("REQUEST URL:", err?.config?.url);
-    console.error("REQUEST METHOD:", err?.config?.method);
+      setResumes(getResumeList(response));
+      setSuccess("Default resume updated.");
+    } catch (err) {
+      setError(
+        getError(err, "Unable to change default resume.")
+      );
+    } finally {
+      setActionId(null);
+    }
+  };
 
-    setError(getError(err, "Unable to change default resume."));
-  } finally {
-    setActionId(null);
-  }
-};
-
+  // Download resume.
   const handleDownload = async (resume) => {
     setActionId(resume.id);
     setError("");
@@ -263,22 +397,70 @@ export default function Profile() {
     try {
       const response = await resumesAPI.download(resume.id);
 
-      const blobUrl = window.URL.createObjectURL(
-        new Blob([response.data])
-      );
+      const blob = new Blob([response.data], {
+        type: response.headers?.["content-type"] ||
+          "application/octet-stream",
+      });
+
+      const blobUrl = window.URL.createObjectURL(blob);
 
       const link = document.createElement("a");
+
       link.href = blobUrl;
-      link.download = resume.file?.split("/").pop() ||
-        `${resume.title}.pdf`;
+      link.download =
+        resume.file?.split("/").pop() ||
+        `${resume.title || "resume"}.pdf`;
 
       document.body.appendChild(link);
       link.click();
       link.remove();
 
-      window.URL.revokeObjectURL(blobUrl);
+      window.setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+      }, 1000);
     } catch (err) {
-      setError(getError(err, "Unable to download resume."));
+      setError(
+        getError(err, "Unable to download resume.")
+      );
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  // Delete resume.
+  const handleDelete = async (resume) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${resume.title}"?`
+    );
+
+    if (!confirmed) return;
+
+    setActionId(resume.id);
+    setError("");
+    setSuccess("");
+
+    try {
+      // Supports either API method name without assuming
+      // which one your resumes.api.js currently exports.
+      const deleteMethod =
+        resumesAPI.delete ?? resumesAPI.remove;
+
+      if (typeof deleteMethod !== "function") {
+        throw new Error(
+          "Resume deletion is not configured in resumes.api.js."
+        );
+      }
+
+      await deleteMethod.call(resumesAPI, resume.id);
+
+      const response = await resumesAPI.getAll();
+
+      setResumes(getResumeList(response));
+      setSuccess("Resume deleted successfully.");
+    } catch (err) {
+      setError(
+        getError(err, "Unable to delete your resume.")
+      );
     } finally {
       setActionId(null);
     }
@@ -299,16 +481,21 @@ export default function Profile() {
         />
 
         <div className="dashboard-content profile-page">
+          {/* Page heading */}
           <div className="dashboard-title-row">
             <div>
               <p className="dashboard-eyebrow">ACCOUNT</p>
+
               <h1>Profile & Resumes</h1>
+
               <p className="dashboard-subtitle">
-                Manage your personal information and resume documents.
+                Manage your personal information, password,
+                and resume documents.
               </p>
             </div>
 
             <button
+              type="button"
               className="refresh-button"
               onClick={loadPage}
               disabled={loading}
@@ -318,14 +505,21 @@ export default function Profile() {
             </button>
           </div>
 
+          {/* Global messages */}
           {error && (
-            <div className="profile-alert profile-alert-error">
+            <div
+              className="profile-alert profile-alert-error"
+              role="alert"
+            >
               {error}
             </div>
           )}
 
           {success && (
-            <div className="profile-alert profile-alert-success">
+            <div
+              className="profile-alert profile-alert-success"
+              role="status"
+            >
               {success}
             </div>
           )}
@@ -336,6 +530,7 @@ export default function Profile() {
             </div>
           ) : (
             <>
+              {/* Personal information */}
               <section className="profile-card">
                 <div className="profile-section-heading">
                   <div className="profile-section-icon">
@@ -352,6 +547,7 @@ export default function Profile() {
                   <div className="profile-form-grid">
                     <label>
                       First name
+
                       <input
                         name="first_name"
                         value={profile.first_name}
@@ -363,6 +559,7 @@ export default function Profile() {
 
                     <label>
                       Last name
+
                       <input
                         name="last_name"
                         value={profile.last_name}
@@ -373,7 +570,9 @@ export default function Profile() {
 
                     <label>
                       Email address
+
                       <input
+                        type="email"
                         value={profile.email}
                         readOnly
                         disabled
@@ -382,6 +581,7 @@ export default function Profile() {
 
                     <label>
                       Phone number
+
                       <input
                         name="phone_number"
                         value={profile.phone_number}
@@ -395,9 +595,9 @@ export default function Profile() {
                     <span>
                       Account created:{" "}
                       {profile.date_joined
-                        ? new Date(profile.date_joined).toLocaleDateString(
-                            "en-IN"
-                          )
+                        ? new Date(
+                            profile.date_joined
+                          ).toLocaleDateString("en-IN")
                         : "Unavailable"}
                     </span>
                   </div>
@@ -408,11 +608,178 @@ export default function Profile() {
                     disabled={saving}
                   >
                     <Save size={16} />
-                    {saving ? "Saving..." : "Save changes"}
+
+                    {saving
+                      ? "Saving..."
+                      : "Save changes"}
                   </button>
                 </form>
               </section>
 
+              {/* Password management */}
+              <section className="profile-card password-card">
+                <div className="profile-section-heading">
+                  <div className="profile-section-icon">
+                    <LockKeyhole size={21} />
+                  </div>
+
+                  <div>
+                    <h2>Password management</h2>
+
+                    <p>
+                      Update your password to keep your
+                      account secure.
+                    </p>
+                  </div>
+                </div>
+
+                <form
+                  className="password-form"
+                  onSubmit={handleChangePassword}
+                >
+                  <div className="password-fields-grid">
+                    {/* Current password */}
+                    <label>
+                      Current password
+
+                      <div className="password-input-wrapper">
+                        <input
+                          type={
+                            showPasswords.old
+                              ? "text"
+                              : "password"
+                          }
+                          name="old_password"
+                          value={passwordData.old_password}
+                          onChange={handlePasswordChange}
+                          autoComplete="current-password"
+                          placeholder="Enter current password"
+                          required
+                        />
+
+                        <button
+                          type="button"
+                          className="password-visibility-button"
+                          onClick={() =>
+                            togglePasswordVisibility("old")
+                          }
+                          aria-label={
+                            showPasswords.old
+                              ? "Hide current password"
+                              : "Show current password"
+                          }
+                        >
+                          {showPasswords.old ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      </div>
+                    </label>
+
+                    {/* New password */}
+                    <label>
+                      New password
+
+                      <div className="password-input-wrapper">
+                        <input
+                          type={
+                            showPasswords.new
+                              ? "text"
+                              : "password"
+                          }
+                          name="new_password"
+                          value={passwordData.new_password}
+                          onChange={handlePasswordChange}
+                          autoComplete="new-password"
+                          placeholder="Enter new password"
+                          required
+                        />
+
+                        <button
+                          type="button"
+                          className="password-visibility-button"
+                          onClick={() =>
+                            togglePasswordVisibility("new")
+                          }
+                          aria-label={
+                            showPasswords.new
+                              ? "Hide new password"
+                              : "Show new password"
+                          }
+                        >
+                          {showPasswords.new ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      </div>
+                    </label>
+
+                    {/* Confirm password */}
+                    <label className="password-confirm-field">
+                      Confirm new password
+
+                      <div className="password-input-wrapper">
+                        <input
+                          type={
+                            showPasswords.confirm
+                              ? "text"
+                              : "password"
+                          }
+                          name="confirm_password"
+                          value={passwordData.confirm_password}
+                          onChange={handlePasswordChange}
+                          autoComplete="new-password"
+                          placeholder="Confirm new password"
+                          required
+                        />
+
+                        <button
+                          type="button"
+                          className="password-visibility-button"
+                          onClick={() =>
+                            togglePasswordVisibility("confirm")
+                          }
+                          aria-label={
+                            showPasswords.confirm
+                              ? "Hide confirmation password"
+                              : "Show confirmation password"
+                          }
+                        >
+                          {showPasswords.confirm ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      </div>
+                    </label>
+                  </div>
+
+                  <p className="password-help-text">
+                    Your new password must satisfy the
+                    password validation rules configured
+                    by the server.
+                  </p>
+
+                  <button
+                    className="profile-primary-button"
+                    type="submit"
+                    disabled={changingPassword}
+                  >
+                    <LockKeyhole size={16} />
+
+                    {changingPassword
+                      ? "Changing password..."
+                      : "Change password"}
+                  </button>
+                </form>
+              </section>
+
+              {/* Resume management */}
               <section className="profile-card">
                 <div className="resume-heading-row">
                   <div className="profile-section-heading">
@@ -422,19 +789,27 @@ export default function Profile() {
 
                     <div>
                       <h2>My resumes</h2>
+
                       <p>
-                        Upload and manage your job application resumes.
+                        Upload and manage your job
+                        application resumes.
                       </p>
                     </div>
                   </div>
 
                   <button
+                    type="button"
                     className="profile-primary-button"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() =>
+                      fileInputRef.current?.click()
+                    }
                     disabled={uploading}
                   >
                     <Upload size={16} />
-                    {uploading ? "Uploading..." : "Upload resume"}
+
+                    {uploading
+                      ? "Uploading..."
+                      : "Upload resume"}
                   </button>
                 </div>
 
@@ -453,7 +828,9 @@ export default function Profile() {
                 {resumes.length === 0 ? (
                   <div className="resume-empty-state">
                     <FileText size={34} />
+
                     <strong>No resumes uploaded</strong>
+
                     <span>
                       Upload your first resume to get started.
                     </span>
@@ -483,17 +860,23 @@ export default function Profile() {
 
                           <span>
                             Uploaded{" "}
-                            {new Date(
-                              resume.uploaded_at
-                            ).toLocaleDateString("en-IN")}
+                            {resume.uploaded_at
+                              ? new Date(
+                                  resume.uploaded_at
+                                ).toLocaleDateString("en-IN")
+                              : "date unavailable"}
                           </span>
                         </div>
 
                         <div className="resume-item-actions">
                           {!resume.is_default && (
                             <button
+                              type="button"
                               title="Set as default"
-                              onClick={() => handleSetDefault(resume.id)}
+                              aria-label={`Set ${resume.title} as default`}
+                              onClick={() =>
+                                handleSetDefault(resume.id)
+                              }
                               disabled={actionId === resume.id}
                             >
                               <Star size={17} />
@@ -501,17 +884,25 @@ export default function Profile() {
                           )}
 
                           <button
+                            type="button"
                             title="Download resume"
-                            onClick={() => handleDownload(resume)}
+                            aria-label={`Download ${resume.title}`}
+                            onClick={() =>
+                              handleDownload(resume)
+                            }
                             disabled={actionId === resume.id}
                           >
                             <Download size={17} />
                           </button>
 
                           <button
+                            type="button"
                             className="resume-delete-button"
                             title="Delete resume"
-                            onClick={() => handleDelete(resume)}
+                            aria-label={`Delete ${resume.title}`}
+                            onClick={() =>
+                              handleDelete(resume)
+                            }
                             disabled={actionId === resume.id}
                           >
                             <Trash2 size={17} />

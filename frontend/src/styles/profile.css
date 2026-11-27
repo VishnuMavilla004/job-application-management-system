@@ -298,3 +298,84 @@
     justify-content: flex-end;
   }
 }
+
+
+/* Password Management */
+
+.password-card {
+  margin-bottom: 24px;
+}
+
+.password-form {
+  margin-top: 24px;
+}
+
+.password-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.password-fields-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.password-confirm-field {
+  grid-column: 1 / -1;
+  max-width: calc(50% - 10px);
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  min-width: 0;
+  padding-right: 46px;
+}
+
+.password-visibility-button {
+  position: absolute;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+}
+
+.password-visibility-button:hover {
+  color: var(--text-primary, #1e293b);
+}
+
+.password-help-text {
+  margin: 16px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary, #64748b);
+}
+
+.password-form .profile-primary-button {
+  margin-top: 4px;
+}
+
+@media (max-width: 700px) {
+  .password-fields-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .password-confirm-field {
+    grid-column: auto;
+    max-width: 100%;
+  }
+}

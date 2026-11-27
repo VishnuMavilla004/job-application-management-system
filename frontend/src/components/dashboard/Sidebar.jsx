@@ -8,7 +8,8 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+
+import { NavLink, Link } from "react-router-dom";
 
 const navigation = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -24,17 +25,29 @@ export default function Sidebar({ open, onClose }) {
     <>
       {open && (
         <button
+          type="button"
           className="sidebar-overlay"
           aria-label="Close navigation"
           onClick={onClose}
         />
       )}
 
-      <aside className={`dashboard-sidebar ${open ? "sidebar-open" : ""}`}>
+      <aside
+        className={`dashboard-sidebar ${open ? "sidebar-open" : ""}`}
+      >
         <div className="sidebar-brand">
-          <BriefcaseBusiness size={25} />
-          <span>CareerTrack</span>
+          <Link
+            to="/dashboard"
+            className="sidebar-brand-link"
+            onClick={onClose}
+            aria-label="CareerTrack dashboard"
+          >
+            <BriefcaseBusiness size={25} />
+            <span>CareerTrack</span>
+          </Link>
+
           <button
+            type="button"
             className="sidebar-close"
             aria-label="Close navigation"
             onClick={onClose}
@@ -45,7 +58,7 @@ export default function Sidebar({ open, onClose }) {
 
         <p className="sidebar-label">WORKSPACE</p>
 
-        <nav className="sidebar-nav">
+        <nav className="sidebar-nav" aria-label="Main navigation">
           {navigation.map(({ label, path, icon: Icon }) => (
             <NavLink
               key={path}
@@ -62,15 +75,21 @@ export default function Sidebar({ open, onClose }) {
           ))}
         </nav>
 
-        <div className="sidebar-footer">
+        <Link
+          to="/dashboard"
+          className="sidebar-footer"
+          onClick={onClose}
+          aria-label="Open CareerTrack job workspace"
+        >
           <div className="sidebar-footer-icon">
             <BriefcaseBusiness size={19} />
           </div>
+
           <div>
             <strong>CareerTrack</strong>
             <p>Job search workspace</p>
           </div>
-        </div>
+        </Link>
       </aside>
     </>
   );

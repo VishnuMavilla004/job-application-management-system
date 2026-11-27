@@ -1,4 +1,3 @@
-
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -9,9 +8,9 @@ import Dashboard from "./pages/Dashboard";
 import Applications from "./pages/Applications";
 import Profile from "./pages/Profile";
 import Kanban from "./pages/Kanban";
-import NotFound from "./pages/NotFound";
-
 import Analytics from "./pages/Analytics";
+import Settings from "./pages/Settings";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
@@ -27,6 +26,7 @@ export default function App() {
         <Route path="/kanban" element={<Kanban />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/settings" element={<Settings />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
