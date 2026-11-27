@@ -2,10 +2,10 @@
 
 A full-stack job application tracking platform built with **Python, Django REST Framework, PostgreSQL, React, and JavaScript**. CareerTrack helps users organize job applications, track recruitment progress, manage resumes, monitor interview activity, and analyze their job search through a centralized dashboard.
 
-**Live Demo:** [Frontend URL](YOUR_FRONTEND_URL)  
-**Backend API:** [Backend URL](YOUR_BACKEND_URL)  
-**API Documentation:** [Swagger UI](YOUR_BACKEND_URL/api/schema/swagger-ui/)  
-**Repository:** [GitHub Repository](YOUR_GITHUB_REPOSITORY_URL)
+**Live Demo:** [Frontend URL](https://careertrack-frontend-npv9.onrender.com)  
+**Backend API:** [Backend URL](https://careertrack-backend-9gb6.onrender.com)  
+**API Documentation:** [Swagger UI](https://careertrack-backend-9gb6.onrender.com/api/schema/swagger-ui/)  
+**Repository:** [GitHub Repository](https://github.com/VishnuMavilla004/job-application-management-system)
 
 ---
 
@@ -252,19 +252,19 @@ Add genuine screenshots from the deployed application to `docs/screenshots/`.
 
 ### Dashboard
 
-![CareerTrack Dashboard](docs/screenshots/dashboard.png)
+![CareerTrack Dashboard]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180529.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180552.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180601.png")
 
 ### Applications
 
-![CareerTrack Applications](docs/screenshots/applications.png)
+![CareerTrack Applications]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180612.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180620.png")
 
 ### Kanban Board
 
-![CareerTrack Kanban Board](docs/screenshots/kanban.png)
+![CareerTrack Kanban Board]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180630.png")
 
 ### Analytics
 
-![CareerTrack Analytics](docs/screenshots/analytics.png)
+![CareerTrack Analytics]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180641.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180654.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180703.png")
 
 ---
 
@@ -474,8 +474,8 @@ B.Tech — Computer Science and Engineering (AI & ML)
 
 Interested in Python Backend Development, Software Engineering, and Full-Stack Development.
 
-- GitHub: [YOUR_GITHUB_PROFILE]
-- LinkedIn: [YOUR_LINKEDIN_PROFILE]
+- GitHub: [https://github.com/VishnuMavilla004]
+- LinkedIn: [https://www.linkedin.com/in/vishnu-mavilla/]
 
 ---
 

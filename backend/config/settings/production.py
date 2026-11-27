@@ -157,8 +157,56 @@ if not FRONTEND_PASSWORD_RESET_URL:
         "FRONTEND_PASSWORD_RESET_URL must be configured."
     )
 
+
+# --------------------------------------------------
+# Persistent resume storage — Supabase S3
+# --------------------------------------------------
+
+required_storage_variables = [
+    "SUPABASE_STORAGE_BUCKET",
+    "SUPABASE_S3_ENDPOINT_URL",
+    "SUPABASE_S3_REGION",
+    "SUPABASE_S3_ACCESS_KEY_ID",
+    "SUPABASE_S3_SECRET_ACCESS_KEY",
+]
+
+missing_storage_variables = [
+    variable
+    for variable in required_storage_variables
+    if not os.environ.get(variable)
+]
+
+if missing_storage_variables:
+    raise RuntimeError(
+        "Missing Supabase storage environment variables: "
+        + ", ".join(missing_storage_variables)
+    )
+
+STORAGES = {
+    **STORAGES,
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": os.environ["SUPABASE_STORAGE_BUCKET"],
+            "endpoint_url": os.environ["SUPABASE_S3_ENDPOINT_URL"],
+            "region_name": os.environ["SUPABASE_S3_REGION"],
+            "access_key": os.environ["SUPABASE_S3_ACCESS_KEY_ID"],
+            "secret_key": os.environ["SUPABASE_S3_SECRET_ACCESS_KEY"],
+            "addressing_style": "path",
+            "signature_version": "s3v4",
+            "default_acl": None,
+            "querystring_auth": True,
+            "querystring_expire": 300,
+            "file_overwrite": False,
+            "use_ssl": True,
+        },
+    },
+}
+
+
 # Production logging goes to the console.
 LOGGING["root"]["handlers"] = ["console"]
 
 # Production should not expose Django debug information.
 DEBUG = False
+
