@@ -251,13 +251,26 @@ Add genuine screenshots from the deployed application to `docs/screenshots/`.
 | API documentation | `swagger.png` |
 
 
+
+## Screenshots
+
 ### Dashboard
 
-![CareerTrack Dashboard]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180529.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180552.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180601.png")
+![CareerTrack Dashboard 1](docs/screenshots/dashboard-1.png)
+
+![CareerTrack Dashboard 2](docs/screenshots/dashboard-2.png)
+
+![CareerTrack Dashboard 3](docs/screenshots/dashboard-3.png)
+
+---
 
 ### Applications
 
-![CareerTrack Applications]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180612.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180620.png")
+![CareerTrack Applications 1](docs/screenshots/applications-1.png)
+
+![CareerTrack Applications 2](docs/screenshots/applications-2.png)
+
+---
 
 ### Kanban Board
 
@@ -267,9 +280,12 @@ Add genuine screenshots from the deployed application to `docs/screenshots/`.
 
 ### Analytics
 
-![CareerTrack Analytics]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180641.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180654.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180703.png")
+![CareerTrack Analytics 1](docs/screenshots/analytics-1.png)
 
----
+![CareerTrack Analytics 2](docs/screenshots/analytics-2.png)
+
+![CareerTrack Analytics 3](docs/screenshots/analytics-3.png)
+
 
 ## Local Installation
 
