@@ -250,21 +250,24 @@ Add genuine screenshots from the deployed application to `docs/screenshots/`.
 | Profile and resume management | `profile-resumes.png` |
 | API documentation | `swagger.png` |
 
+
 ### Dashboard
 
-![CareerTrack Dashboard]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180529.png")("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180552.png")("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180601.png")
+![CareerTrack Dashboard]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180529.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180552.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180601.png")
 
 ### Applications
 
-![CareerTrack Applications]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180612.png")("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180620.png")
+![CareerTrack Applications]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180612.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180620.png")
 
 ### Kanban Board
 
-![CareerTrack Kanban Board]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180630.png")
+![CareerTrack Kanban Board](docs/screenshots/kanban.png)
+
+---
 
 ### Analytics
 
-![CareerTrack Analytics]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180641.png")("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180654.png")("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180703.png")
+![CareerTrack Analytics]("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180641.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180654.png"("C:\Users\Vishn\OneDrive\Pictures\Screenshots\Screenshot 2026-11-27 180703.png")
 
 ---
 
